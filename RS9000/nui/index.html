@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+  </head>
+  <body>
+    <div id="radar" style="display: none">
+
+      <div class="primary">
+        <table class="front">
+          <tr>
+            <td>
+              <ul class="lamps">
+                <li id="front-same">Same</li>
+                <li id="front-opp">Opp</li>
+                <li id="front-xmit" class="lit">XMit</li>
+              </ul>
+            </td>
+            <td>
+              <span class="label">Front</span>
+              <div class="display orange">
+                <span id="front-speed"></span>
+              </div>
+            </td>
+            <td>
+              <span class="label dim">Fast</span>
+              <div class="display red">
+                <span id="front-fast"></span>
+              </div>
+            </td>
+            <td>
+              <div class="arrows">
+                <span class="arrow up">&#129053;</span>
+                <span class="arrow down">&#129055;</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+      
+        <table class="rear">
+          <tr>
+            <td>
+              <ul class="lamps">
+                <li id="rear-same">Same</li>
+                <li id="rear-opp">Opp</li>
+                <li id="rear-xmit" class="lit">XMit</li>
+              </ul>
+            </td>
+            <td>
+              <div class="display orange">
+                <span id="rear-speed"></span>
+              </div>
+              <span class="label">Rear</span>
+            </td>
+            <td>
+              <div class="display red">
+                <span id="rear-fast"></span>
+              </div>
+              <span class="label dim">Fast</span>
+            </td>
+            <td>
+              <div class="arrows">
+                <span class="arrow up">&#129053;</span>
+                <span class="arrow down">&#129055;</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="patrol">
+        <span class="label logo">RS 9000</span>
+        <div class="display green">
+          <span id="patrol-speed"></span>
+        </div>
+        <span class="label">Patrol Speed</span>
+      </div>
+
+    </div>
+
+    <script src="index.js" type="text/javascript"></script>
+  </body>
+</html>
