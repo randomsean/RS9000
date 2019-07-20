@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace RS9000
 {
@@ -50,6 +52,12 @@ namespace RS9000
             await Delay(10);
 
             Radar.Update();
+        }
+
+        public static void SendMessage(MessageType type, object data)
+        {
+            string json = JObject.FromObject(new { type, data }).ToString();
+            API.SendNuiMessage(json);
         }
     }
 }

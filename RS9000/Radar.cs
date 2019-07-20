@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using CitizenFX.Core;
-using CitizenFX.Core.Native;
 
 namespace RS9000
 {
@@ -18,13 +16,12 @@ namespace RS9000
                 if (value != enabled)
                 {
                     enabled = value;
-                    string v = value ? "true" : "false";
-                    API.SendNuiMessage($"{{\"enabled\": {v}}}");
+                    Script.SendMessage(MessageType.DisplayRadar, enabled);
                 }
             }
         }
 
-        public Antenna[] Antennae { get; } = new Antenna[]
+        public Antenna[] Antennas { get; } = new Antenna[]
         {
             new Antenna("front", 0),
             new Antenna("rear", 180),
@@ -43,9 +40,9 @@ namespace RS9000
                 return;
             }
 
-            List<string> data = new List<string>();
+            float patrol = v.Velocity.Length();
 
-            foreach (Antenna antenna in Antennae)
+            foreach (Antenna antenna in Antennas)
             {
                 if (!antenna.Enabled)
                 {
@@ -59,26 +56,20 @@ namespace RS9000
                 {
                     continue;
                 }
-
-                data.Add(antenna.ToJson());
             }
 
-            StringBuilder b = new StringBuilder("{");
-
-            b.Append($"\"speed\": {v.Velocity.Length()}, \"antennae\": [");
-
-            for (int i = 0; i < data.Count; i++)
+            Script.SendMessage(MessageType.Heartbeat, new
             {
-                b.Append(data[i]);
-                if (i != data.Count - 1)
-                {
-                    b.Append(',');
-                }
-            }
-
-            b.Append("]}");
-
-            API.SendNuiMessage(b.ToString());
+                patrol,
+                antennas =
+                    from a in Antennas
+                    select new
+                    {
+                        name = a.Name,
+                        speed = a.Speed,
+                        fast = a.FastSpeed,
+                    }
+            });
         }
     }
 }

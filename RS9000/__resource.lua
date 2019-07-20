@@ -8,6 +8,7 @@ files {
 	'nui/style.css',
 	'nui/d-din.otf',
 	'nui/dseg7.ttf',
+	'Newtonsoft.Json.dll',
 }
 
 client_script 'RS9000.net.dll'

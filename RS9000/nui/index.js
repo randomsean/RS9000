@@ -21,6 +21,13 @@ var antennaElements = {
     }
 }
 
+const messageTypes = {
+    initialize: 0,
+    heartbeat: 1,
+    switchMode: 2,
+    displayRadar: 3,
+};
+
 var patrolSpeed = document.getElementById('patrol-speed');
 
 function toMPH(speed) {
@@ -50,31 +57,38 @@ function setLamp(el, value) {
     }
 }
 
+function heartbeat(data) {
+    updateSpeed(patrolSpeed, data.patrol);
+
+    data.antennas.forEach(function (a) {
+        var el = antennaElements[a.name];
+        if (el != null) {
+            updateSpeed(el.speed, a.speed);
+            updateSpeed(el.fast, a.fast);
+        }
+    });
+}
+
+function setDisplay(el, display) {
+    if (el == null) {
+        return;
+    }
+    if (display) {
+        el.style.display = 'block';
+    } else {
+        el.style.display = 'none';
+    }
+}
+
 window.addEventListener('message', function(e) {
     var item = e.data;
 
-    if ('enabled' in item) {
-        if (item.enabled) {
-            radar.style.display = 'block';
-            return;
-        }
-        radar.style.display = 'none';
-        return;
+    switch (item.type) {
+        case messageTypes.heartbeat:
+            heartbeat(item.data);
+            break;
+        case messageTypes.displayRadar:
+            setDisplay(radar, item.data);
+            break;
     }
-
-    updateSpeed(patrolSpeed, item.speed);
-
-    item.antennae.forEach(function (antenna) {
-        var obj = antennaElements[antenna.name];
-        updateSpeed(obj.speed, antenna.speed);
-        updateSpeed(obj.fast, antenna.fast);
-
-        if (antenna.mode == 0) {
-            setLamp(obj.lamps.same, true);
-            setLamp(obj.lamps.opp, false);
-        } else {
-            setLamp(obj.lamps.same, false);
-            setLamp(obj.lamps.opp, true);
-        }
-    });
 });

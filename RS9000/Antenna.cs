@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+
 using CitizenFX.Core;
 
 namespace RS9000
@@ -87,18 +87,6 @@ namespace RS9000
             }
 
             return true;
-        }
-
-        public string ToJson()
-        {
-            var b = new StringBuilder("{");
-
-            b.Append("\"name\": \"").Append(Name).Append("\",");
-            b.Append("\"speed\": ").Append(Speed).Append(',');
-            b.Append("\"fast\": ").Append(FastSpeed).Append(',');
-            b.Append("\"mode\": ").Append((int)Mode);
-
-            return b.Append("}").ToString();
         }
     }
 }
