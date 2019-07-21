@@ -8,22 +8,22 @@ namespace RS9000
     {
         public const float MaxSpeed = 999f;
 
-        private bool enabled;
-        public bool Enabled
+        private bool isEnabled;
+        public bool IsEnabled
         {
-            get => enabled;
+            get => isEnabled;
             set
             {
-                if (enabled != value)
+                if (isEnabled != value)
                 {
-                    enabled = value;
+                    isEnabled = value;
                     Script.SendMessage(MessageType.AntennaPower, new
                     {
                         name = Name,
-                        enabled,
+                        isEnabled,
                         mode = Mode,
                     });
-                    if (!enabled)
+                    if (!isEnabled)
                     {
                         Reset();
                     }
@@ -60,18 +60,18 @@ namespace RS9000
             set => fastLimit = Clamp(value, 0, MaxSpeed);
         }
 
-        private bool fastLocked;
-        public bool FastLocked
+        private bool isFastLocked;
+        public bool IsFastLocked
         {
-            get => fastLocked;
+            get => isFastLocked;
             set
             {
-                if (value == fastLocked)
+                if (value == isFastLocked)
                 {
                     return;
                 }
-                fastLocked = value;
-                if (!fastLocked)
+                isFastLocked = value;
+                if (!isFastLocked)
                 {
                     FastSpeed = 0;
                 }
@@ -83,6 +83,8 @@ namespace RS9000
         private Vector3 Direction { get; }
 
         public string Name { get; }
+
+        public event EventHandler<FastLockedEventArgs> FastLocked;
 
         private static readonly Vector3[] angles = new Vector3[]
         {
@@ -110,12 +112,12 @@ namespace RS9000
         public void ResetFast()
         {
             FastSpeed = 0;
-            FastLocked = false;
+            IsFastLocked = false;
         }
 
         public bool Poll()
         {
-            if (!Enabled || Source == null)
+            if (!IsEnabled || Source == null)
             {
                 return false;
             }
@@ -140,13 +142,24 @@ namespace RS9000
                 Speed = target.Velocity.Length();
             }
 
-            if (Speed > FastLimit && !FastLocked)
+            if (Speed > FastLimit && !IsFastLocked)
             {
                 FastSpeed = Speed;
-                FastLocked = true;
+                IsFastLocked = true;
+                FastLocked?.Invoke(this, new FastLockedEventArgs(FastSpeed));
             }
 
             return true;
+        }
+    }
+
+    internal class FastLockedEventArgs : EventArgs
+    {
+        public float Speed { get; }
+
+        public FastLockedEventArgs(float speed)
+        {
+            Speed = speed;
         }
     }
 }

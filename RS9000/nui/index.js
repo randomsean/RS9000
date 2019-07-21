@@ -27,6 +27,7 @@ const elements = {
 const controls = {
     radarPower: document.getElementById('radar-power'),
     radarDisplay: document.getElementById('radar-display'),
+    radarBeep: document.getElementById('radar-beep'),
     antennas: {
         front: {
             power: document.getElementById('front-power'),
@@ -51,6 +52,7 @@ const messageTypes = {
     displayControl: 4,
     radarPower: 5,
     antennaPower: 6,
+    radarBeep: 7,
 };
 
 const antennaModes = {
@@ -203,6 +205,9 @@ window.addEventListener('message', function(e) {
             break;
         case messageTypes.antennaPower:
             setAntennaPower(item.data.name, item.data.enabled, item.data.mode);
+            break;
+        case messageTypes.radarBeep:
+            setButtonLamp(controls.radarBeep, item.data);
             break;
     }
 });

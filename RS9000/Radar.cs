@@ -8,34 +8,48 @@ namespace RS9000
 {
     internal class Radar
     {
-        private bool enabled;
-        public bool Enabled
+        private bool isEnabled;
+        public bool IsEnabled
         {
-            get => enabled;
+            get => isEnabled;
             set
             {
-                if (value != enabled)
+                if (value != isEnabled)
                 {
-                    enabled = value;
+                    isEnabled = value;
                     Script.SendMessage(MessageType.RadarPower, value);
                     foreach (Antenna antenna in Antennas.Values)
                     {
-                        antenna.Enabled = value;
+                        antenna.IsEnabled = value;
                     }
                 }
             }
         }
 
-        private bool displayed;
-        public bool Displayed
+        private bool isDisplayed;
+        public bool IsDisplayed
         {
-            get => displayed;
+            get => isDisplayed;
             set
             {
-                if (value != displayed)
+                if (value != isDisplayed)
                 {
-                    displayed = value;
-                    Script.SendMessage(MessageType.DisplayRadar, displayed);
+                    isDisplayed = value;
+                    Script.SendMessage(MessageType.DisplayRadar, isDisplayed);
+                }
+            }
+        }
+
+        private bool shouldBeep;
+        public bool ShouldBeep
+        {
+            get => shouldBeep;
+            set
+            {
+                if (value != shouldBeep)
+                {
+                    shouldBeep = value;
+                    Script.SendMessage(MessageType.RadarBeep, value);
                 }
             }
         }
@@ -46,24 +60,17 @@ namespace RS9000
             { "rear", new Antenna("rear", 180) },
         };
 
-        private static uint ConvertSpeed(float speed)
+        public Radar()
         {
-            switch (Script.Units)
+            foreach (Antenna antenna in Antennas.Values)
             {
-                case "mph":
-                    speed *= 2.237f;
-                    break;
-                case "km/h":
-                    speed *= 3.6f;
-                    break;
+                antenna.FastLocked += OnFastLocked;
             }
-
-            return (uint)Math.Floor(speed);
         }
 
         public void Update()
         {
-            if (!Enabled)
+            if (!IsEnabled)
             {
                 return;
             }
@@ -76,7 +83,7 @@ namespace RS9000
 
             foreach (Antenna antenna in Antennas.Values)
             {
-                if (!antenna.Enabled)
+                if (!antenna.IsEnabled)
                 {
                     continue;
                 }
@@ -95,7 +102,7 @@ namespace RS9000
                 speed = ConvertSpeed(v.Speed),
                 antennas =
                     from a in Antennas.Values
-                    where a.Enabled
+                    where a.IsEnabled
                     select new
                     {
                         name = a.Name,
@@ -103,6 +110,29 @@ namespace RS9000
                         fast = ConvertSpeed(a.FastSpeed),
                     }
             });
+        }
+
+        private void OnFastLocked(object sender, FastLockedEventArgs e)
+        {
+            if (ShouldBeep)
+            {
+                Audio.PlaySoundFrontend("Beep_Red", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
+            }
+        }
+
+        private static uint ConvertSpeed(float speed)
+        {
+            switch (Script.Units)
+            {
+                case "mph":
+                    speed *= 2.237f;
+                    break;
+                case "km/h":
+                    speed *= 3.6f;
+                    break;
+            }
+
+            return (uint)Math.Floor(speed);
         }
     }
 }
