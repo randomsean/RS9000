@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using CitizenFX.Core;
-using CitizenFX.Core.Native;
 
 namespace RS9000
 {
@@ -18,17 +17,49 @@ namespace RS9000
                 if (value != enabled)
                 {
                     enabled = value;
-                    string v = value ? "true" : "false";
-                    API.SendNuiMessage($"{{\"enabled\": {v}}}");
+                    Script.SendMessage(MessageType.RadarPower, value);
+                    foreach (Antenna antenna in Antennas.Values)
+                    {
+                        antenna.Enabled = value;
+                    }
                 }
             }
         }
 
-        public Antenna[] Antennae { get; } = new Antenna[]
+        private bool displayed;
+        public bool Displayed
         {
-            new Antenna("front", 0),
-            new Antenna("rear", 180),
+            get => displayed;
+            set
+            {
+                if (value != displayed)
+                {
+                    displayed = value;
+                    Script.SendMessage(MessageType.DisplayRadar, displayed);
+                }
+            }
+        }
+
+        public readonly IReadOnlyDictionary<string, Antenna> Antennas = new Dictionary<string, Antenna>()
+        {
+            { "front", new Antenna("front", 0) },
+            { "rear", new Antenna("rear", 180) },
         };
+
+        private static uint ConvertSpeed(float speed)
+        {
+            switch (Script.Units)
+            {
+                case "mph":
+                    speed *= 2.237f;
+                    break;
+                case "km/h":
+                    speed *= 3.6f;
+                    break;
+            }
+
+            return (uint)Math.Floor(speed);
+        }
 
         public void Update()
         {
@@ -43,9 +74,9 @@ namespace RS9000
                 return;
             }
 
-            List<string> data = new List<string>();
+            float speed = v.Velocity.Length();
 
-            foreach (Antenna antenna in Antennae)
+            foreach (Antenna antenna in Antennas.Values)
             {
                 if (!antenna.Enabled)
                 {
@@ -59,26 +90,21 @@ namespace RS9000
                 {
                     continue;
                 }
-
-                data.Add(antenna.ToJson());
             }
 
-            StringBuilder b = new StringBuilder("{");
-
-            b.Append($"\"speed\": {v.Velocity.Length()}, \"antennae\": [");
-
-            for (int i = 0; i < data.Count; i++)
+            Script.SendMessage(MessageType.Heartbeat, new
             {
-                b.Append(data[i]);
-                if (i != data.Count - 1)
-                {
-                    b.Append(',');
-                }
-            }
-
-            b.Append("]}");
-
-            API.SendNuiMessage(b.ToString());
+                speed = ConvertSpeed(speed),
+                antennas =
+                    from a in Antennas.Values
+                    where a.Enabled
+                    select new
+                    {
+                        name = a.Name,
+                        speed = ConvertSpeed(a.Speed),
+                        fast = ConvertSpeed(a.FastSpeed),
+                    }
+            });
         }
     }
 }
