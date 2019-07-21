@@ -8,5 +8,8 @@ namespace RS9000
         Heartbeat,
         SwitchMode,
         DisplayRadar,
+        DisplayControl,
+        RadarPower,
+        AntennaPower,
     }
 }

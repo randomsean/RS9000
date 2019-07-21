@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Threading.Tasks;
 
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
-using Newtonsoft.Json;
+
 using Newtonsoft.Json.Linq;
 
 namespace RS9000
@@ -11,11 +13,25 @@ namespace RS9000
     internal class Script : BaseScript
     {
         private readonly Radar Radar = new Radar();
+        private readonly Controller controller;
+
+        public const string Units = "mph";
 
         public Script()
         {
+            controller = new Controller(this, Radar);
+
             Tick += Update;
             Tick += CheckInputs;
+        }
+
+        public void RegisterNUICallback(string msg, Action<IDictionary<string, object>, CallbackDelegate> callback)
+        {
+            API.RegisterNuiCallbackType(msg);
+            EventHandlers[$"__cfx_nui:{msg}"] += new Action<ExpandoObject, CallbackDelegate>((body, result) =>
+            {
+                callback?.Invoke(body, result);
+            });
         }
 
         public static Vehicle GetVehicleDriving(Ped ped)
@@ -35,13 +51,18 @@ namespace RS9000
 
         private async Task CheckInputs()
         {
-            if (Radar.Enabled && !InEmergencyVehicle)
+            if (Radar.Displayed && !InEmergencyVehicle)
             {
-                Radar.Enabled = false;
+                Radar.Displayed = false;
             }
-            else if (InEmergencyVehicle && !Radar.Enabled)
+            else if (InEmergencyVehicle && !Radar.Displayed && Radar.Enabled)
             {
-                Radar.Enabled = true;
+                Radar.Displayed = true;
+            }
+
+            if (Game.IsControlJustPressed(0, Control.VehicleDuck) && InEmergencyVehicle)
+            {
+                controller.Visible = !controller.Visible;
             }
 
             await Delay(0);

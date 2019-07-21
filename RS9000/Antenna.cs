@@ -8,9 +8,46 @@ namespace RS9000
     {
         public const float MaxSpeed = 999f;
 
-        public bool Enabled { get; set; } = true;
+        private bool enabled;
+        public bool Enabled
+        {
+            get => enabled;
+            set
+            {
+                if (enabled != value)
+                {
+                    enabled = value;
+                    Script.SendMessage(MessageType.AntennaPower, new
+                    {
+                        name = Name,
+                        enabled,
+                        mode = Mode,
+                    });
+                    if (!enabled)
+                    {
+                        Reset();
+                    }
+                }
+            }
+        }
 
-        public AntennaMode Mode { get; set; }
+        private AntennaMode mode;
+        public AntennaMode Mode
+        {
+            get => mode;
+            set
+            {
+                if (value != mode)
+                {
+                    mode = value;
+                    Script.SendMessage(MessageType.SwitchMode, new
+                    {
+                        name = Name,
+                        mode = (int)mode,
+                    });
+                }
+            }
+        }
 
         public float Speed { get; private set; }
 
@@ -23,7 +60,23 @@ namespace RS9000
             set => fastLimit = Clamp(value, 0, MaxSpeed);
         }
 
-        public bool FastLocked { get; set; }
+        private bool fastLocked;
+        public bool FastLocked
+        {
+            get => fastLocked;
+            set
+            {
+                if (value == fastLocked)
+                {
+                    return;
+                }
+                fastLocked = value;
+                if (!fastLocked)
+                {
+                    FastSpeed = 0;
+                }
+            }
+        }
 
         public Entity Source { get; set; }
 

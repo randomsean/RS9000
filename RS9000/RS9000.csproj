@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Antenna.cs" />
     <Compile Include="AntennaMode.cs" />
+    <Compile Include="Controller.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

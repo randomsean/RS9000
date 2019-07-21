@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using CitizenFX.Core;
@@ -16,16 +17,49 @@ namespace RS9000
                 if (value != enabled)
                 {
                     enabled = value;
-                    Script.SendMessage(MessageType.DisplayRadar, enabled);
+                    Script.SendMessage(MessageType.RadarPower, value);
+                    foreach (Antenna antenna in Antennas.Values)
+                    {
+                        antenna.Enabled = value;
+                    }
                 }
             }
         }
 
-        public Antenna[] Antennas { get; } = new Antenna[]
+        private bool displayed;
+        public bool Displayed
         {
-            new Antenna("front", 0),
-            new Antenna("rear", 180),
+            get => displayed;
+            set
+            {
+                if (value != displayed)
+                {
+                    displayed = value;
+                    Script.SendMessage(MessageType.DisplayRadar, displayed);
+                }
+            }
+        }
+
+        public readonly IReadOnlyDictionary<string, Antenna> Antennas = new Dictionary<string, Antenna>()
+        {
+            { "front", new Antenna("front", 0) },
+            { "rear", new Antenna("rear", 180) },
         };
+
+        private static uint ConvertSpeed(float speed)
+        {
+            switch (Script.Units)
+            {
+                case "mph":
+                    speed *= 2.237f;
+                    break;
+                case "km/h":
+                    speed *= 3.6f;
+                    break;
+            }
+
+            return (uint)Math.Floor(speed);
+        }
 
         public void Update()
         {
@@ -40,9 +74,9 @@ namespace RS9000
                 return;
             }
 
-            float patrol = v.Velocity.Length();
+            float speed = v.Velocity.Length();
 
-            foreach (Antenna antenna in Antennas)
+            foreach (Antenna antenna in Antennas.Values)
             {
                 if (!antenna.Enabled)
                 {
@@ -60,14 +94,15 @@ namespace RS9000
 
             Script.SendMessage(MessageType.Heartbeat, new
             {
-                patrol,
+                speed = ConvertSpeed(speed),
                 antennas =
-                    from a in Antennas
+                    from a in Antennas.Values
+                    where a.Enabled
                     select new
                     {
                         name = a.Name,
-                        speed = a.Speed,
-                        fast = a.FastSpeed,
+                        speed = ConvertSpeed(a.Speed),
+                        fast = ConvertSpeed(a.FastSpeed),
                     }
             });
         }

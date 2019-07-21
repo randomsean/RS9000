@@ -134,8 +134,8 @@ html, body {
 }
 
 #control .btn-grid button.lit {
-  background-color: #620000;
-  color: #ff0000;
+    background-color: #620000;
+    color: #ff0000;
 }
 
 #control .btn-grid td {
@@ -152,7 +152,7 @@ html, body {
   background-color: #180000;
 }
 
-#control .btn-grid button {
+#control button {
   width: 50px;
   height: 50px;
   border: 2px solid #000;
@@ -160,6 +160,22 @@ html, body {
   font-family: 'D-DIN Bold';
   font-weight: bold;
   font-size: 9pt;
+  text-transform: uppercase;
   background-color: #111;
   color: #aaa;
+  overflow-wrap: normal;
 }
+
+#control button:focus {
+    border: 2px solid #000;
+}
+
+#control .btn-block {
+    display: block;
+    width: 100%;
+}
+
+#control .btn-sm {
+    height: 25px;
+}
+
