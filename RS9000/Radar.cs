@@ -74,8 +74,6 @@ namespace RS9000
                 return;
             }
 
-            float speed = v.Velocity.Length();
-
             foreach (Antenna antenna in Antennas.Values)
             {
                 if (!antenna.Enabled)
@@ -94,7 +92,7 @@ namespace RS9000
 
             Script.SendMessage(MessageType.Heartbeat, new
             {
-                speed = ConvertSpeed(speed),
+                speed = ConvertSpeed(v.Speed),
                 antennas =
                     from a in Antennas.Values
                     where a.Enabled

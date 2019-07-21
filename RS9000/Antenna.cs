@@ -131,7 +131,14 @@ namespace RS9000
                 return false;
             }
 
-            Speed = target.Velocity.Length();
+            if (target is Vehicle)
+            {
+                Speed = ((Vehicle)target).Speed;
+            }
+            else
+            {
+                Speed = target.Velocity.Length();
+            }
 
             if (Speed > FastLimit && !FastLocked)
             {
