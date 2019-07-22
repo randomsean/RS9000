@@ -51,13 +51,13 @@ namespace RS9000
 
         private async Task CheckInputs()
         {
-            if (Radar.Displayed && !InEmergencyVehicle)
+            if (Radar.IsDisplayed && !InEmergencyVehicle)
             {
-                Radar.Displayed = false;
+                Radar.IsDisplayed = false;
             }
-            else if (InEmergencyVehicle && !Radar.Displayed && Radar.Enabled)
+            else if (InEmergencyVehicle && !Radar.IsDisplayed && Radar.IsEnabled)
             {
-                Radar.Displayed = true;
+                Radar.IsDisplayed = true;
             }
 
             if (Game.IsControlJustPressed(0, Control.VehicleDuck) && InEmergencyVehicle)

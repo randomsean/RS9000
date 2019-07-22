@@ -11,5 +11,6 @@ namespace RS9000
         DisplayControl,
         RadarPower,
         AntennaPower,
+        RadarBeep,
     }
 }

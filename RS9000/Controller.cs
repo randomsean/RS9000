@@ -34,6 +34,7 @@ namespace RS9000
             script.RegisterNUICallback("radarDisplay", new Action<IDictionary<string, object>, CallbackDelegate>(ToggleRadarDisplay));
             script.RegisterNUICallback("antennaPower", new Action<IDictionary<string, object>, CallbackDelegate>(ToggleAntennaPower));
             script.RegisterNUICallback("antennaMode", new Action<IDictionary<string, object>, CallbackDelegate>(SwitchAntennaMode));
+            script.RegisterNUICallback("toggleBeep", new Action<IDictionary<string, object>, CallbackDelegate>(ToggleBeep));
             script.RegisterNUICallback("resetFast", new Action<IDictionary<string, object>, CallbackDelegate>(ResetFast));
 
             this.radar = radar; 
@@ -41,12 +42,12 @@ namespace RS9000
 
         private void ToggleRadarPower(IDictionary<string, object> body, CallbackDelegate result)
         {
-            radar.Enabled = !radar.Enabled;
+            radar.IsEnabled = !radar.IsEnabled;
         }
 
         private void ToggleRadarDisplay(IDictionary<string, object> body, CallbackDelegate result)
         {
-            radar.Displayed = !radar.Displayed;
+            radar.IsDisplayed = !radar.IsDisplayed;
         }
 
         private void ToggleAntennaPower(IDictionary<string, object> body, CallbackDelegate result)
@@ -56,7 +57,7 @@ namespace RS9000
             {
                 return;
             }
-            antenna.Enabled = !antenna.Enabled;
+            antenna.IsEnabled = !antenna.IsEnabled;
         }
 
         private void SwitchAntennaMode(IDictionary<string, object> body, CallbackDelegate result)
@@ -66,18 +67,23 @@ namespace RS9000
             {
                 return;
             }
-            if (!antenna.Enabled)
+            if (!antenna.IsEnabled)
             {
                 return;
             }
             antenna.Mode = (antenna.Mode == AntennaMode.Same ? AntennaMode.Opposite : AntennaMode.Same);
         }
 
+        private void ToggleBeep(IDictionary<string, object> body, CallbackDelegate result)
+        {
+            radar.ShouldBeep = !radar.ShouldBeep;
+        }
+
         private void ResetFast(IDictionary<string, object> body, CallbackDelegate result)
         {
             foreach (Antenna antenna in radar.Antennas.Values)
             {
-                antenna.FastLocked = false;
+                antenna.IsFastLocked = false;
             }
         }
     }
