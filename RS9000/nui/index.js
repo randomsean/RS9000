@@ -223,7 +223,7 @@ window.addEventListener('message', function(e) {
             setPower(item.data);
             break;
         case messageTypes.antennaPower:
-            setAntennaPower(item.data.name, item.data.enabled, item.data.mode);
+            setAntennaPower(item.data.name, item.data.powered, item.data.mode);
             break;
         case messageTypes.radarBeep:
             setButtonLamp(controls.radarBeep, item.data);

@@ -102,7 +102,7 @@ namespace RS9000
                 speed = ConvertSpeed(v.Speed),
                 antennas =
                     from a in Antennas.Values
-                    where a.IsEnabled
+                    where a.IsEnabled && a.Target != null
                     select new
                     {
                         name = a.Name,

@@ -20,7 +20,7 @@ namespace RS9000
                     Script.SendMessage(MessageType.AntennaPower, new
                     {
                         name = Name,
-                        isEnabled,
+                        powered = value,
                         mode = Mode,
                     });
                     if (!isEnabled)
@@ -48,6 +48,8 @@ namespace RS9000
                 }
             }
         }
+
+        public Entity Target { get; private set; }
 
         public float Speed { get; private set; }
 
@@ -131,6 +133,7 @@ namespace RS9000
         {
             if (!IsEnabled || Source == null)
             {
+                Target = null;
                 TargetDirection = TargetDirection.None;
                 return false;
             }
@@ -140,23 +143,24 @@ namespace RS9000
 
             RaycastResult result = World.RaycastCapsule(Source.Position, max, 2, (IntersectOptions)10, Source);
 
-            Entity target = result.HitEntity;
-            if (target == null || !target.Exists())
+            Target = result.HitEntity;
+            if (Target == null || !Target.Exists())
             {
+                Target = null;
                 TargetDirection = TargetDirection.None;
                 return false;
             }
 
-            if (target is Vehicle)
+            if (Target is Vehicle)
             {
-                Speed = ((Vehicle)target).Speed;
+                Speed = ((Vehicle)Target).Speed;
             }
             else
             {
-                Speed = target.Velocity.Length();
+                Speed = Target.Velocity.Length();
             }
 
-            TargetDirection = IsHeadingTowards(Source, target) ? TargetDirection.Coming : TargetDirection.Going;
+            TargetDirection = IsHeadingTowards(Source, Target) ? TargetDirection.Coming : TargetDirection.Going;
 
             if (Speed > FastLimit && !IsFastLocked)
             {
