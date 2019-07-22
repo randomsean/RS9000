@@ -55,6 +55,7 @@
     <Compile Include="Script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Radar.cs" />
+    <Compile Include="TargetDirection.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

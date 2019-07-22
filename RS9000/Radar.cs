@@ -108,6 +108,7 @@ namespace RS9000
                         name = a.Name,
                         speed = ConvertSpeed(a.Speed),
                         fast = ConvertSpeed(a.FastSpeed),
+                        dir = a.TargetDirection,
                     }
             });
         }

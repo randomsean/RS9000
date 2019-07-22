@@ -10,6 +10,8 @@ const elements = {
                 same: document.getElementById('front-same'),
                 opp: document.getElementById('front-opp'),
                 xmit: document.getElementById('front-xmit'),
+                fwd: document.getElementById('front-fwd'),
+                bwd: document.getElementById('front-bwd'),
             },
         },
         rear: {
@@ -19,6 +21,8 @@ const elements = {
                 same: document.getElementById('rear-same'),
                 opp: document.getElementById('rear-opp'),
                 xmit: document.getElementById('rear-xmit'),
+                fwd: document.getElementById('rear-fwd'),
+                bwd: document.getElementById('rear-bwd'),
             },
         },
     },
@@ -58,6 +62,12 @@ const messageTypes = {
 const antennaModes = {
     same: 0,
     opp: 1,
+};
+
+const targetDirections = {
+    none: 0,
+    coming: 1,
+    going: 2,
 };
 
 function clearDisplays(value, antennas) {
@@ -106,6 +116,14 @@ function setAntennaPower(antennaName, powered, mode) {
     setButtonLamp(controls.antennas[antennaName].power, powered);
 }
 
+function setAntennaDirection(antennas) {
+    for (let i in antennas) {
+        let a = antennas[i];
+        setLamp(a.name, 'fwd', a.dir == targetDirections.going);
+        setLamp(a.name, 'bwd', a.dir == targetDirections.coming);
+    }
+}
+
 function init(data) {
     settings.resourceName = data.resourceName;
 }
@@ -133,6 +151,7 @@ function setDisplays(speed, antennas) {
 
 function heartbeat(data) {
     setDisplays(data.speed, data.antennas);
+    setAntennaDirection(data.antennas);
 }
 
 function switchMode(antennaName, mode) {

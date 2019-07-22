@@ -86,6 +86,8 @@ namespace RS9000
 
         public event EventHandler<FastLockedEventArgs> FastLocked;
 
+        public TargetDirection TargetDirection { get; set; }
+
         private static readonly Vector3[] angles = new Vector3[]
         {
             new Vector3(0, 50, 0), // AntennaMode.Same
@@ -115,10 +117,21 @@ namespace RS9000
             IsFastLocked = false;
         }
 
+        public bool IsHeadingTowards(Entity source, Entity target)
+        {
+            float diff = (source.Heading - target.Heading + 180) % 360;
+            if (diff < 0)
+                diff += 360;
+            diff -= 180;
+            diff = Math.Abs(diff);
+            return diff > 90;
+        }
+
         public bool Poll()
         {
             if (!IsEnabled || Source == null)
             {
+                TargetDirection = TargetDirection.None;
                 return false;
             }
 
@@ -130,6 +143,7 @@ namespace RS9000
             Entity target = result.HitEntity;
             if (target == null || !target.Exists())
             {
+                TargetDirection = TargetDirection.None;
                 return false;
             }
 
@@ -141,6 +155,8 @@ namespace RS9000
             {
                 Speed = target.Velocity.Length();
             }
+
+            TargetDirection = IsHeadingTowards(Source, target) ? TargetDirection.Coming : TargetDirection.Going;
 
             if (Speed > FastLimit && !IsFastLocked)
             {
