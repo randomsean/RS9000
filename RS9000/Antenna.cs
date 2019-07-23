@@ -1,6 +1,7 @@
 ﻿using System;
 
 using CitizenFX.Core;
+using CitizenFX.Core.Native;
 
 namespace RS9000
 {
@@ -141,6 +142,10 @@ namespace RS9000
             Vector3 offset = angles[(int)Mode] * Direction;
             Vector3 max = Source.GetOffsetPosition(offset);
 
+#if DEBUG
+            DrawLine(Source.Position, max, 0xFF, 0x00, 0x00);
+#endif
+
             RaycastResult result = World.RaycastCapsule(Source.Position, max, 2, (IntersectOptions)10, Source);
 
             Target = result.HitEntity;
@@ -171,6 +176,13 @@ namespace RS9000
 
             return true;
         }
+
+#if DEBUG
+        private static void DrawLine(Vector3 from, Vector3 to, int r, int g, int b)
+        {
+            API.DrawLine(from.X, from.Y, from.Z, to.X, to.Y, to.Z, r, g, b, 0xFF);
+        }
+#endif
     }
 
     internal class FastLockedEventArgs : EventArgs
