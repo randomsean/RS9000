@@ -56,30 +56,9 @@ namespace RS9000
 
         public float FastSpeed { get; private set; }
 
-        private float fastLimit;
-        public float FastLimit
-        {
-            get => fastLimit;
-            set => fastLimit = Clamp(value, 0, MaxSpeed);
-        }
+        public float FastLimit { get; set; }
 
-        private bool isFastLocked;
-        public bool IsFastLocked
-        {
-            get => isFastLocked;
-            set
-            {
-                if (value == isFastLocked)
-                {
-                    return;
-                }
-                isFastLocked = value;
-                if (!isFastLocked)
-                {
-                    FastSpeed = 0;
-                }
-            }
-        }
+        public bool IsFastLocked { get; set; }
 
         public Entity Source { get; set; }
 
@@ -101,11 +80,6 @@ namespace RS9000
         {
             Name = name;
             Direction = GameMath.HeadingToDirection(heading) + Vector3.UnitX;
-        }
-
-        private float Clamp(float value, float min, float max)
-        {
-            return (value < min) ? min : (value > max) ? max : value;
         }
 
         public void Reset()

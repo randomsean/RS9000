@@ -15,6 +15,8 @@ namespace RS9000
         private readonly Radar Radar = new Radar();
         private readonly Controller controller;
 
+        private bool IsDisplayingKeyboard { get; set; }
+
         public const string Units = "mph";
 
         public Script()
@@ -23,6 +25,11 @@ namespace RS9000
 
             Tick += Update;
             Tick += CheckInputs;
+        }
+
+        public void RegisterEventHandler(string eventName, Delegate callback)
+        {
+            EventHandlers[eventName] += callback;
         }
 
         public void RegisterNUICallback(string msg, Action<IDictionary<string, object>, CallbackDelegate> callback)
@@ -75,10 +82,57 @@ namespace RS9000
             Radar.Update();
         }
 
+        public void ShowKeyboard(int limit, string text = "")
+        {
+            if (IsDisplayingKeyboard)
+            {
+                return;
+            }
+
+            API.DisplayOnscreenKeyboard(0, "", "", text, "", "", "", limit);
+
+            Tick += KeyboardUpdate;
+        }
+
+        private Task KeyboardUpdate()
+        {
+            int status = API.UpdateOnscreenKeyboard();
+
+            if (status == 1)
+            {
+                string result = API.GetOnscreenKeyboardResult();
+                TriggerEvent("rs9000:_keyboardResult", result);
+            }
+
+            if (status == 1 || status == 2)
+            {
+                Tick -= KeyboardUpdate;
+                IsDisplayingKeyboard = false;
+            }
+
+            return Task.FromResult(0);
+        }
+
         public static void SendMessage(MessageType type, object data)
         {
             string json = JObject.FromObject(new { type, data }).ToString();
             API.SendNuiMessage(json);
+        }
+
+        public static float ConvertSpeedToMeters(float speed)
+        {
+            switch (Units)
+            {
+                case "mph":
+                    speed /= 2.237f;
+                    break;
+                case "km/h":
+                    speed /= 3.6f;
+                    break;
+                default:
+                    throw new NotSupportedException("Units not supported");
+            }
+            return speed;
         }
     }
 }

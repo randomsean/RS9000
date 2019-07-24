@@ -24,6 +24,7 @@ namespace RS9000
             }
         }
 
+        private readonly Script script;
         private readonly Radar radar;
 
         public Controller(Script script, Radar radar)
@@ -36,7 +37,11 @@ namespace RS9000
             script.RegisterNUICallback("antennaMode", new Action<IDictionary<string, object>, CallbackDelegate>(SwitchAntennaMode));
             script.RegisterNUICallback("toggleBeep", new Action<IDictionary<string, object>, CallbackDelegate>(ToggleBeep));
             script.RegisterNUICallback("resetFast", new Action<IDictionary<string, object>, CallbackDelegate>(ResetFast));
+            script.RegisterNUICallback("setFastLimit", new Action<IDictionary<string, object>, CallbackDelegate>(SetFastLimit));
 
+            script.RegisterEventHandler("rs9000:_keyboardResult", new Action<string>(KeyboardResult));
+
+            this.script = script;
             this.radar = radar; 
         }
 
@@ -83,7 +88,27 @@ namespace RS9000
         {
             foreach (Antenna antenna in radar.Antennas.Values)
             {
-                antenna.IsFastLocked = false;
+                antenna.ResetFast();
+            }
+        }
+
+        private void SetFastLimit(IDictionary<string, object> body, CallbackDelegate result)
+        {
+            Visible = false;
+            script.ShowKeyboard(Antenna.MaxSpeed.ToString().Length);
+        }
+
+        private void KeyboardResult(string result)
+        {
+            if (!uint.TryParse(result, out uint n) || n > Antenna.MaxSpeed)
+            {
+                return;
+            }
+
+            foreach (Antenna antenna in radar.Antennas.Values)
+            {
+                antenna.FastLimit = Script.ConvertSpeedToMeters(n);
+                antenna.ResetFast();
             }
         }
     }
