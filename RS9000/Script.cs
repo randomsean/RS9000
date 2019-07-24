@@ -58,6 +58,15 @@ namespace RS9000
 
         private async Task CheckInputs()
         {
+            if (API.IsPauseMenuActive())
+            {
+                if (Radar.IsDisplayed)
+                {
+                    Radar.IsDisplayed = false;
+                }
+                return;
+            }
+
             if (Radar.IsDisplayed && !InEmergencyVehicle)
             {
                 Radar.IsDisplayed = false;
