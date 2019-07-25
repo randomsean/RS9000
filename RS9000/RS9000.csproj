@@ -58,9 +58,6 @@
     <Compile Include="TargetDirection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <None Include="__resource.lua" />
   </ItemGroup>
