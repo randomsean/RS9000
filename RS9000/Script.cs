@@ -82,7 +82,11 @@ namespace RS9000
                 Radar.IsDisplayed = true;
             }
 
-            if (Game.IsControlJustPressed(0, Control.VehicleDuck) && InEmergencyVehicle)
+            Game.DisableControlThisFrame(0, Control.VehicleDuck);
+
+            if (Game.IsControlPressed(0, Control.ScriptRLeft) &&
+                Game.IsDisabledControlJustPressed(0, Control.VehicleDuck) &&
+                InEmergencyVehicle)
             {
                 controller.Visible = !controller.Visible;
             }
