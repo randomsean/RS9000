@@ -3,6 +3,8 @@ RS9000 is a realistic traffic enforcement radar system for FiveM servers.
 
 ***Warning:** RS9000 is a **work in progress**. Currently there is no guarantee on the stability of the software. All features are subject to change.*
 
+![Radar](https://i.imgur.com/Ugp6wLo.png)
+
 ## Features
 
 * An elegant and **realistic look**
@@ -28,7 +30,13 @@ ensure rs9000
 
 ## Configuration
 
-*Configuration information coming soon.*
+Configuration occurs in the `config.json` file included in the release zip. Please make sure this file exists and has the default values  even if you do not wish to make configuration changes.
+
+The following is the currently supported configuration keys and values:
+
+| Key     | Values        | Default | Notes                                  |
+| ------- | ------------- | ------- | -------------------------------------- |
+| `units` | `mph`, `km/h` | `mph`   | Units of speed displayed on the radar |
 
 ## Contribute
 
