@@ -107,7 +107,7 @@ namespace RS9000
 
             foreach (Antenna antenna in radar.Antennas.Values)
             {
-                antenna.FastLimit = Script.ConvertSpeedToMeters(n);
+                antenna.FastLimit = Script.ConvertSpeedToMeters(script.Config.Units, n);
                 antenna.ResetFast();
             }
         }

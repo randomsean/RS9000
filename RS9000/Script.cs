@@ -3,24 +3,30 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
-
-using Newtonsoft.Json.Linq;
 
 namespace RS9000
 {
     internal class Script : BaseScript
     {
-        private readonly Radar Radar = new Radar();
+        private readonly Radar Radar;
         private readonly Controller controller;
+        
+        public Config Config { get; } 
 
         private bool IsDisplayingKeyboard { get; set; }
 
-        public const string Units = "mph";
-
         public Script()
         {
+            string configData = API.LoadResourceFile(API.GetCurrentResourceName(), "config.json");
+            Config = JsonConvert.DeserializeObject<Config>(configData);
+            Config.Validate();
+
+            Radar = new Radar(this);
             controller = new Controller(this, Radar);
 
             Tick += Update;
@@ -128,9 +134,25 @@ namespace RS9000
             API.SendNuiMessage(json);
         }
 
-        public static float ConvertSpeedToMeters(float speed)
+        public static float ConvertMetersToSpeed(string units, float speed)
         {
-            switch (Units)
+            switch (units)
+            {
+                case "mph":
+                    speed *= 2.237f;
+                    break;
+                case "km/h":
+                    speed *= 3.6f;
+                    break;
+                default:
+                    throw new NotSupportedException("units not supported");
+            }
+            return speed;
+        }
+
+        public static float ConvertSpeedToMeters(string units, float speed)
+        {
+            switch (units)
             {
                 case "mph":
                     speed /= 2.237f;
@@ -139,7 +161,7 @@ namespace RS9000
                     speed /= 3.6f;
                     break;
                 default:
-                    throw new NotSupportedException("Units not supported");
+                    throw new NotSupportedException("units not supported");
             }
             return speed;
         }

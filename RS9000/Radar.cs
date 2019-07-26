@@ -60,8 +60,12 @@ namespace RS9000
             { "rear", new Antenna("rear", 180) },
         };
 
-        public Radar()
+        private readonly Script script;
+
+        public Radar(Script script)
         {
+            this.script = script;
+
             foreach (Antenna antenna in Antennas.Values)
             {
                 antenna.FastLocked += OnFastLocked;
@@ -99,15 +103,15 @@ namespace RS9000
 
             Script.SendMessage(MessageType.Heartbeat, new
             {
-                speed = ConvertSpeed(v.Speed),
+                speed = (uint)Script.ConvertMetersToSpeed(script.Config.Units, v.Speed),
                 antennas =
                     from a in Antennas.Values
                     where a.IsEnabled && a.Target != null
                     select new
                     {
                         name = a.Name,
-                        speed = ConvertSpeed(a.Speed),
-                        fast = ConvertSpeed(a.FastSpeed),
+                        speed = (uint)Script.ConvertMetersToSpeed(script.Config.Units, a.Speed),
+                        fast = (uint)Script.ConvertMetersToSpeed(script.Config.Units, a.FastSpeed),
                         dir = a.TargetDirection,
                     }
             });
@@ -119,21 +123,6 @@ namespace RS9000
             {
                 Audio.PlaySoundFrontend("Beep_Red", "DLC_HEIST_HACKING_SNAKE_SOUNDS");
             }
-        }
-
-        private static uint ConvertSpeed(float speed)
-        {
-            switch (Script.Units)
-            {
-                case "mph":
-                    speed *= 2.237f;
-                    break;
-                case "km/h":
-                    speed *= 3.6f;
-                    break;
-            }
-
-            return (uint)Math.Floor(speed);
         }
     }
 }
