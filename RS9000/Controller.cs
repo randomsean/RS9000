@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
+using CitizenFX.Core.UI;
 
 namespace RS9000
 {
@@ -110,6 +111,8 @@ namespace RS9000
                 antenna.FastLimit = Script.ConvertSpeedToMeters(script.Config.Units, n);
                 antenna.ResetFast();
             }
+
+            Screen.ShowSubtitle($"Fast limit set to ~y~{n} {script.Config.Units}");
         }
     }
 }
