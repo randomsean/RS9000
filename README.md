@@ -13,7 +13,7 @@ RS9000 is a realistic traffic enforcement radar system for FiveM servers.
 
 Control of the radar system is done using the control panel.
 
-* Press **X** to open the control panel
+* Press **Ctrl+X** to open the control panel
 
 ## Installation
 
