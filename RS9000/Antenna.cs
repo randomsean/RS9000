@@ -141,11 +141,17 @@ namespace RS9000
 
             TargetDirection = IsHeadingTowards(Source, Target) ? TargetDirection.Coming : TargetDirection.Going;
 
-            if (Speed > FastLimit && !IsFastLocked)
+            if (Speed > FastLimit)
             {
-                FastSpeed = Speed;
-                IsFastLocked = true;
-                FastLocked?.Invoke(this, new FastLockedEventArgs(FastSpeed));
+                if (Speed > FastSpeed)
+                {
+                    FastSpeed = Speed;
+                }
+                if (!IsFastLocked)
+                {
+                    IsFastLocked = true;
+                    FastLocked?.Invoke(this, new FastLockedEventArgs(FastSpeed));
+                }
             }
 
             return true;
