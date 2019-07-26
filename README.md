@@ -40,4 +40,6 @@ If you would like to suggest a feature, please open an issue with the *enhanceme
 
 RS9000 is licensed under the [MIT license](https://github.com/randomsean/RS9000/blob/master/LICENSE).
 
+The in-game interface uses the [DSEG](https://www.keshikan.net/fonts-e.html) and [D-DIN](https://www.datto.com/fonts/d-din/) fonts. Both fonts are licensed under the [SIL Open Font License 1.1](https://scripts.sil.org/OFL).
+
 *This project is heavily based on the fantastic **WraithRS** project by **WolfKnight**. Thanks, WolfKnight, for the inspiration!*
