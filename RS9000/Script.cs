@@ -91,7 +91,7 @@ namespace RS9000
                 controller.Visible = !controller.Visible;
             }
 
-            await Delay(0);
+            await Task.FromResult(0);
         }
 
         private async Task Update()
