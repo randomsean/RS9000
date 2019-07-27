@@ -34,9 +34,15 @@ Configuration occurs in the `config.json` file included in the release zip. Plea
 
 The following is the currently supported configuration keys and values:
 
-| Key     | Values        | Default | Notes                                  |
-| ------- | ------------- | ------- | -------------------------------------- |
-| `units` | `mph`, `km/h` | `mph`   | Units of speed displayed on the radar |
+| Key                                  | Values            | Default | Notes                                  |
+| ------------------------------------ | ----------------- | ------- | -------------------------------------- |
+| `units`                              | `"mph"`, `"km/h"` | `"mph"` | Units of speed displayed on the radar  |
+| `controls.openControlPanel.modifier` | Control index     | `224`   | `INPUT_SCRIPT_RLEFT` or `LEFT CTRL`    |
+| `controls.openControlPanel.control`  | Control index     | `73`    | `INPUT_VEH_DUCK` or `X`                |
+
+#### Controls
+
+To configure controls, use the control index values found [here](https://docs.fivem.net/game-references/controls/). To disable the use of a control or modifier, set its index to `-1`.
 
 ## Contribute
 

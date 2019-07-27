@@ -1,3 +1,9 @@
 {
-    "units": "mph"
+  "units": "mph",
+  "controls": {
+    "openControlPanel": {
+      "modifier": 224,
+      "control": 73
+    }
+  }
 }
