@@ -124,7 +124,7 @@ html, body {
 
 .display.plate::after {
   position: absolute;
-  content: '88888888';
+  content: '~~~~~~~~';
 }
 
 .arrows {
@@ -199,17 +199,22 @@ html, body {
 }
 
 #plates {
-  width: 235px;
-  height: 82px;
+  width: 190px;
+  height: 105px;
   position: absolute;
   bottom: 10px;
   right: 420px;
   background-color: #0a0a0a;
   border: 5px solid #000;
   border-radius: 10px;
+  z-index: -1;
 }
 
 #plates .label {
-  width: 3em;
   margin-left: 0.25em;
+  line-height: 1.5em;
+}
+
+#plates .lamps li {
+  width: 3em;
 }
