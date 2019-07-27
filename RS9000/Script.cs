@@ -138,36 +138,6 @@ namespace RS9000
             API.SendNuiMessage(json);
         }
 
-        public static float ConvertMetersToSpeed(string units, float speed)
-        {
-            switch (units)
-            {
-                case "mph":
-                    speed *= 2.237f;
-                    break;
-                case "km/h":
-                    speed *= 3.6f;
-                    break;
-                default:
-                    throw new NotSupportedException("units not supported");
-            }
-            return speed;
-        }
-
-        public static float ConvertSpeedToMeters(string units, float speed)
-        {
-            switch (units)
-            {
-                case "mph":
-                    speed /= 2.237f;
-                    break;
-                case "km/h":
-                    speed /= 3.6f;
-                    break;
-                default:
-                    throw new NotSupportedException("units not supported");
-            }
-            return speed;
-        }
+        
     }
 }

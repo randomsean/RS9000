@@ -96,19 +96,19 @@ namespace RS9000
         private void SetFastLimit(IDictionary<string, object> body, CallbackDelegate result)
         {
             Visible = false;
-            script.ShowKeyboard(Antenna.MaxSpeed.ToString().Length);
+            script.ShowKeyboard(Radar.MaxSpeed.ToString().Length);
         }
 
         private void KeyboardResult(string result)
         {
-            if (!uint.TryParse(result, out uint n) || n > Antenna.MaxSpeed)
+            if (!uint.TryParse(result, out uint n) || n > Radar.MaxSpeed)
             {
                 return;
             }
 
             foreach (Antenna antenna in radar.Antennas.Values)
             {
-                antenna.FastLimit = Script.ConvertSpeedToMeters(script.Config.Units, n);
+                antenna.FastLimit = Radar.ConvertSpeedToMeters(script.Config.Units, n);
                 antenna.ResetFast();
             }
 

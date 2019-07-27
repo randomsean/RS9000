@@ -8,51 +8,63 @@ namespace RS9000
 {
     internal class Radar
     {
-        private bool isEnabled;
+        public const float MaxSpeed = 999f;
+
         public bool IsEnabled
         {
             get => isEnabled;
             set
             {
-                if (value != isEnabled)
+                if (value == isEnabled)
                 {
-                    isEnabled = value;
-                    Script.SendMessage(MessageType.RadarPower, value);
-                    foreach (Antenna antenna in Antennas.Values)
-                    {
-                        antenna.IsEnabled = value;
-                    }
+                    return;
                 }
+
+                Script.SendMessage(MessageType.RadarPower, value);
+
+                foreach (Antenna antenna in Antennas.Values)
+                {
+                    antenna.IsEnabled = value;
+                }
+
+                isEnabled = value;
             }
         }
+        private bool isEnabled;
 
-        private bool isDisplayed;
         public bool IsDisplayed
         {
             get => isDisplayed;
             set
             {
-                if (value != isDisplayed)
+                if (value == isDisplayed)
                 {
-                    isDisplayed = value;
-                    Script.SendMessage(MessageType.DisplayRadar, isDisplayed);
+                    return;
                 }
+
+                Script.SendMessage(MessageType.DisplayRadar, value);
+
+                isDisplayed = value;
             }
         }
+        private bool isDisplayed;
 
-        private bool shouldBeep;
         public bool ShouldBeep
         {
             get => shouldBeep;
             set
             {
-                if (value != shouldBeep)
+                if (value == shouldBeep)
                 {
-                    shouldBeep = value;
-                    Script.SendMessage(MessageType.RadarBeep, value);
+                    return;
                 }
+
+                Script.SendMessage(MessageType.RadarBeep, value);
+
+                shouldBeep = value;
             }
         }
+        private bool shouldBeep;
 
         public readonly IReadOnlyDictionary<string, Antenna> Antennas = new Dictionary<string, Antenna>()
         {
@@ -103,18 +115,50 @@ namespace RS9000
 
             Script.SendMessage(MessageType.Heartbeat, new
             {
-                speed = (uint)Script.ConvertMetersToSpeed(script.Config.Units, v.Speed),
+                speed = (uint)ConvertMetersToSpeed(script.Config.Units, v.Speed),
                 antennas =
                     from a in Antennas.Values
                     where a.IsEnabled && a.Target != null
                     select new
                     {
                         name = a.Name,
-                        speed = (uint)Script.ConvertMetersToSpeed(script.Config.Units, a.Speed),
-                        fast = (uint)Script.ConvertMetersToSpeed(script.Config.Units, a.FastSpeed),
+                        speed = (uint)ConvertMetersToSpeed(script.Config.Units, a.Speed),
+                        fast = (uint)ConvertMetersToSpeed(script.Config.Units, a.FastSpeed),
                         dir = a.TargetDirection,
                     }
             });
+        }
+
+        public static float ConvertMetersToSpeed(string units, float speed)
+        {
+            switch (units)
+            {
+                case "mph":
+                    speed *= 2.237f;
+                    break;
+                case "km/h":
+                    speed *= 3.6f;
+                    break;
+                default:
+                    throw new NotSupportedException("units not supported");
+            }
+            return speed;
+        }
+
+        public static float ConvertSpeedToMeters(string units, float speed)
+        {
+            switch (units)
+            {
+                case "mph":
+                    speed /= 2.237f;
+                    break;
+                case "km/h":
+                    speed /= 3.6f;
+                    break;
+                default:
+                    throw new NotSupportedException("units not supported");
+            }
+            return speed;
         }
 
         private void OnFastLocked(object sender, FastLockedEventArgs e)
