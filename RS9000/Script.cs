@@ -23,7 +23,9 @@ namespace RS9000
         public Script()
         {
             string configData = API.LoadResourceFile(API.GetCurrentResourceName(), "config.json");
-            Config = JsonConvert.DeserializeObject<Config>(configData);
+
+            Config = Config.Base;
+            JsonConvert.PopulateObject(configData, Config);
             Config.Validate();
 
             Radar = new Radar(this);
@@ -82,11 +84,12 @@ namespace RS9000
                 Radar.IsDisplayed = true;
             }
 
-            Game.DisableControlThisFrame(0, Control.VehicleDuck);
+            bool modifierPressed = Config.Controls.OpenControlPanel.Modifier.HasValue &&
+                Game.IsControlPressed(0, Config.Controls.OpenControlPanel.Modifier.Value);
 
-            if (Game.IsControlPressed(0, Control.ScriptRLeft) &&
-                Game.IsDisabledControlJustPressed(0, Control.VehicleDuck) &&
-                InEmergencyVehicle)
+            bool controlPressed = Game.IsControlJustPressed(0, Config.Controls.OpenControlPanel.Control.Value);
+
+            if (modifierPressed && controlPressed && InEmergencyVehicle)
             {
                 controller.Visible = !controller.Visible;
             }
