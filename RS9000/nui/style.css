@@ -4,6 +4,11 @@
 }
 
 @font-face {
+  font-family: 'DSEG14ClassicMini';
+  src: url('dseg14.ttf');
+}
+
+@font-face {
   font-family: 'D-DIN Bold';
   src: url('d-din.otf');
 }
@@ -54,11 +59,11 @@ html, body {
   color: #666;
 }
 
-.front .lamps, .front .arrows {
+#radar .front .lamps, #radar .front .arrows {
   margin-top: 15px;
 }
 
-.rear .lamps, .rear .arrows {
+#radar .rear .lamps, #radar .rear .arrows {
   margin-bottom: 15px;
 }
 
@@ -107,6 +112,20 @@ html, body {
 
 .display.green span { color: #18f400; }
 .display.green { color: #0e3800; background-color: #072600; }
+
+.display.plate {
+  width: 6.6em;
+  height: 1.2em;
+  line-height: 1.2em;
+  font-size: 16pt;
+  border: 2px solid #000;
+  font-family: 'DSEG14ClassicMini';
+}
+
+.display.plate::after {
+  position: absolute;
+  content: '88888888';
+}
 
 .arrows {
   width: 15px;
@@ -179,3 +198,18 @@ html, body {
     height: 25px;
 }
 
+#plates {
+  width: 235px;
+  height: 82px;
+  position: absolute;
+  bottom: 10px;
+  right: 420px;
+  background-color: #0a0a0a;
+  border: 5px solid #000;
+  border-radius: 10px;
+}
+
+#plates .label {
+  width: 3em;
+  margin-left: 0.25em;
+}
