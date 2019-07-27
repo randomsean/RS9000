@@ -91,7 +91,7 @@ html, body {
 
 .display::after {
   position: absolute;
-  content: '000';
+  content: '888';
 }
 
 .display span {
