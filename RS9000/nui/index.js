@@ -26,6 +26,23 @@ const elements = {
             },
         },
     },
+    plateDisplay: document.getElementById('plates'),
+    plateReader: {
+        front: {
+            plate: document.getElementById('front-plate'),
+            lamps: {
+                power: document.getElementById('front-plate-power'),
+                lock: document.getElementById('front-plate-lock'),
+            },
+        },
+        rear: {
+            plate: document.getElementById('rear-plate'),
+            lamps: {
+                power: document.getElementById('rear-plate-power'),
+                lock: document.getElementById('rear-plate-lock'),
+            },
+        },
+    },
 };
 
 const controls = {
@@ -46,6 +63,7 @@ const controls = {
 
 var settings = {
     resourceName: 'rs9000',
+    plateReader: false,
 }
 
 const messageTypes = {
@@ -81,6 +99,9 @@ function clearDisplays(value, antennas) {
         }
         elements.antennas[antenna].speed.innerText = formatDisplay(value);
         elements.antennas[antenna].fast.innerText = formatDisplay(value);
+        if (settings.plateReader) {
+            elements.plateReader[antenna].plate.innerText = '';
+        }
     }
 }
 
@@ -91,6 +112,11 @@ function clearLamps(antennaNames) {
             continue;
         }
         let lamps = antennas[antenna].lamps;
+
+        if (settings.plateReader) {
+            lamps = lamps.concat(elements.plateReader.lamps);
+        }
+
         for (let lamp in lamps) {
             lamps[lamp].classList.remove('lit');
         }
@@ -107,7 +133,10 @@ function setPower(powered) {
 
 function setAntennaPower(antennaName, powered, mode) {
     clearLamps([antennaName]);
-    setLamp(antennaName, 'xmit', powered);
+    setLamp(elements.antennas, antennaName, 'xmit', powered);
+    if (settings.radarDisplay) {
+        setLamp(elements.radarDisplay, antennaName, 'power', powered);
+    }
     if (powered) {
         switchMode(antennaName, mode);
     }
@@ -119,13 +148,14 @@ function setAntennaPower(antennaName, powered, mode) {
 function setAntennaDirection(antennas) {
     for (let i in antennas) {
         let a = antennas[i];
-        setLamp(a.name, 'fwd', a.dir == targetDirections.going);
-        setLamp(a.name, 'bwd', a.dir == targetDirections.coming);
+        setLamp(elements.antennas, a.name, 'fwd', a.dir == targetDirections.going);
+        setLamp(elements.antennas, a.name, 'bwd', a.dir == targetDirections.coming);
     }
 }
 
 function init(data) {
     settings.resourceName = data.resourceName;
+    settings.plateDisplay = data.plateDisplay;
 }
 
 function formatDisplay(n) {
@@ -155,8 +185,8 @@ function heartbeat(data) {
 }
 
 function switchMode(antennaName, mode) {
-    setLamp(antennaName, 'same', mode == antennaModes.same);
-    setLamp(antennaName, 'opp', mode == antennaModes.opp);
+    setLamp(elements.antennas, antennaName, 'same', mode == antennaModes.same);
+    setLamp(elements.antennas, antennaName, 'opp', mode == antennaModes.opp);
 }
 
 function setButtonLamp(el, enabled) {
@@ -167,8 +197,8 @@ function setButtonLamp(el, enabled) {
     }
 }
 
-function setLamp(antennaName, lampName, enabled) {
-    var el = elements.antennas[antennaName].lamps[lampName];
+function setLamp(antennas, antennaName, lampName, enabled) {
+    var el = antennas[antennaName].lamps[lampName];
     if (el == null) {
         return;
     }
@@ -215,6 +245,9 @@ window.addEventListener('message', function(e) {
             break;
         case messageTypes.displayRadar:
             setDisplay(elements.radar, item.data);
+            if (settings.radarDisplay) {
+                setDisplay(elements.plateDisplay, item.data)
+            }
             break;
         case messageTypes.displayControl:
             setDisplay(elements.control, item.data);
