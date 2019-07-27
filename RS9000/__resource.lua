@@ -9,6 +9,7 @@ files {
 	'nui/style.css',
 	'nui/d-din.otf',
 	'nui/dseg7.ttf',
+	'nui/dseg14.ttf',
 	'Newtonsoft.Json.dll',
 }
 

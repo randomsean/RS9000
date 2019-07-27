@@ -80,6 +80,30 @@ namespace RS9000
         }
         private AntennaMode mode;
 
+        public Entity LockedTarget
+        {
+            get => lockedTarget;
+            set
+            {
+                if (value == lockedTarget)
+                {
+                    return;
+                }
+
+                bool locked = value != null;
+
+                Script.SendMessage(MessageType.TargetLock, new
+                {
+                    name = Name,
+                    locked,
+                    plate = locked && value is Vehicle v ? v.Mods.LicensePlate : null,
+                });
+
+                lockedTarget = value;
+            }
+        }
+        private Entity lockedTarget;
+
         public Entity Target { get; private set; }
 
         public TargetDirection TargetDirection { get; set; }
@@ -89,8 +113,6 @@ namespace RS9000
         public float FastSpeed { get; private set; }
 
         public float FastLimit { get; set; }
-
-        public bool IsFastLocked { get; set; }
 
         public Entity Source { get; set; }
 
@@ -115,7 +137,7 @@ namespace RS9000
         public void ResetFast()
         {
             FastSpeed = 0;
-            IsFastLocked = false;
+            LockedTarget = null;
         }
 
         public bool Poll()
@@ -161,9 +183,9 @@ namespace RS9000
                 {
                     FastSpeed = Speed;
                 }
-                if (!IsFastLocked)
+                if (LockedTarget == null)
                 {
-                    IsFastLocked = true;
+                    LockedTarget = Target;
                     FastLocked?.Invoke(this, new FastLockedEventArgs(FastSpeed));
                 }
             }

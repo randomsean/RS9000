@@ -75,6 +75,7 @@ const messageTypes = {
     radarPower: 5,
     antennaPower: 6,
     radarBeep: 7,
+    targetLock: 8,
 };
 
 const antennaModes = {
@@ -111,14 +112,15 @@ function clearLamps(antennaNames) {
         if (antennaNames != undefined && !antennaNames.includes(antenna)) {
             continue;
         }
-        let lamps = antennas[antenna].lamps;
 
-        if (settings.plateReader) {
-            lamps = lamps.concat(elements.plateReader.lamps);
+        for (let lamp in antennas[antenna].lamps) {
+            antennas[antenna].lamps[lamp].classList.remove('lit');
         }
 
-        for (let lamp in lamps) {
-            lamps[lamp].classList.remove('lit');
+        if (settings.plateReader) {
+            for (let lamp in elements.plateReader.lamps) {
+                elements.plateReader.lamps[lamp].classList.remove('lit');
+            }
         }
     }
 }
@@ -134,8 +136,8 @@ function setPower(powered) {
 function setAntennaPower(antennaName, powered, mode) {
     clearLamps([antennaName]);
     setLamp(elements.antennas, antennaName, 'xmit', powered);
-    if (settings.radarDisplay) {
-        setLamp(elements.radarDisplay, antennaName, 'power', powered);
+    if (settings.plateReader) {
+        setLamp(elements.plateReader, antennaName, 'power', powered);
     }
     if (powered) {
         switchMode(antennaName, mode);
@@ -154,8 +156,10 @@ function setAntennaDirection(antennas) {
 }
 
 function init(data) {
-    settings.resourceName = data.resourceName;
-    settings.plateDisplay = data.plateDisplay;
+    if (data.resourceName !== undefined) {
+        settings.resourceName = data.resourceName;
+    }
+    settings.plateReader = data.plateReader === undefined ? false : data.plateReader;
 }
 
 function formatDisplay(n) {
@@ -209,6 +213,14 @@ function setLamp(antennas, antennaName, lampName, enabled) {
     }
 }
 
+function setPlateDisplay(antennaName, plate) {
+    let value = plate;
+    if (value === undefined) {
+        value = '';
+    }
+    elements.plateReader[antennaName].plate.innerText = value;
+}
+
 function setDisplay(el, display) {
     if (el == null) {
         return;
@@ -245,7 +257,7 @@ window.addEventListener('message', function(e) {
             break;
         case messageTypes.displayRadar:
             setDisplay(elements.radar, item.data);
-            if (settings.radarDisplay) {
+            if (settings.plateReader) {
                 setDisplay(elements.plateDisplay, item.data)
             }
             break;
@@ -260,6 +272,12 @@ window.addEventListener('message', function(e) {
             break;
         case messageTypes.radarBeep:
             setButtonLamp(controls.radarBeep, item.data);
+            break;
+        case messageTypes.targetLock:
+            if (settings.plateReader) {
+                setLamp(elements.plateReader, item.data.name, 'lock', item.data.locked);
+                setPlateDisplay(item.data.name, item.data.plate);
+            }
             break;
     }
 });

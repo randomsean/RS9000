@@ -12,5 +12,6 @@ namespace RS9000
         RadarPower,
         AntennaPower,
         RadarBeep,
+        TargetLock,
     }
 }
