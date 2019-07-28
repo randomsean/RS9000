@@ -242,3 +242,9 @@ for (var i = 0; i < buttons.length; i++) {
         sendMessage(this.getAttribute('data-event'), this.getAttribute('data-value'));
     }
 }
+
+document.onkeyup = function (e) {
+    if (e.keyCode == 27) { // Esc
+        sendMessage('close', null);
+    }
+}
