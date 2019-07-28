@@ -4,11 +4,6 @@
 }
 
 @font-face {
-  font-family: 'DSEG14ClassicMini';
-  src: url('dseg14.ttf');
-}
-
-@font-face {
   font-family: 'D-DIN Bold';
   src: url('d-din.otf');
 }
@@ -114,17 +109,23 @@ html, body {
 .display.green { color: #0e3800; background-color: #072600; }
 
 .display.plate {
-  width: 6.6em;
+  display: block;
+  width: 6em;
   height: 1.2em;
-  line-height: 1.2em;
+  line-height: 1.1em;
   font-size: 16pt;
   border: 2px solid #000;
-  font-family: 'DSEG14ClassicMini';
+  font-family: Consolas;
+  letter-spacing: 0.1em;
 }
 
 .display.plate::after {
   position: absolute;
-  content: '~~~~~~~~';
+  content: '';
+}
+
+.display.plate span {
+  margin-left: 0.35em;
 }
 
 .arrows {
@@ -199,8 +200,8 @@ html, body {
 }
 
 #plates {
-  width: 190px;
-  height: 105px;
+  width: 180px;
+  height: 100px;
   position: absolute;
   bottom: 10px;
   right: 420px;
