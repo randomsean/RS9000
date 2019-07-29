@@ -69,11 +69,7 @@ namespace RS9000
         private void SwitchAntennaMode(IDictionary<string, object> body, CallbackDelegate result)
         {
             string name = (string)body["data"];
-            if (!radar.Antennas.TryGetValue(name, out Antenna antenna))
-            {
-                return;
-            }
-            if (!antenna.IsEnabled)
+            if (!radar.Antennas.TryGetValue(name, out Antenna antenna) || !antenna.IsEnabled)
             {
                 return;
             }
@@ -106,9 +102,10 @@ namespace RS9000
                 return;
             }
 
+            radar.FastLimit = Radar.ConvertSpeedToMeters(script.Config.Units, n);
+
             foreach (Antenna antenna in radar.Antennas.Values)
             {
-                antenna.FastLimit = Radar.ConvertSpeedToMeters(script.Config.Units, n);
                 antenna.ResetFast();
             }
 
