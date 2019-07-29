@@ -58,6 +58,11 @@ namespace RS9000
 
         private void ToggleAntennaPower(IDictionary<string, object> body, CallbackDelegate result)
         {
+            if (!radar.IsEnabled)
+            {
+                return;
+            }
+
             string name = (string)body["data"];
             if (!radar.Antennas.TryGetValue(name, out Antenna antenna))
             {
