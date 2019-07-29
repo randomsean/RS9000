@@ -278,6 +278,9 @@ window.addEventListener('message', function(e) {
                 setLamp(elements.plateReader, item.data.name, 'lock', item.data.locked);
                 setPlateDisplay(item.data.name, item.data.plate);
             }
+            if (!item.data.locked) {
+                clearDisplays(0, [item.data.name]);
+            }
             break;
     }
 });
