@@ -1,5 +1,8 @@
 {
   "units": "mph",
+  "plateReader": true,
+  "beep": true,
+  "fastLimit": 80,
   "controls": {
     "openControlPanel": {
       "modifier": 224,

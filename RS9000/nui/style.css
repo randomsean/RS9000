@@ -54,11 +54,11 @@ html, body {
   color: #666;
 }
 
-.front .lamps, .front .arrows {
+#radar .front .lamps, #radar .front .arrows {
   margin-top: 15px;
 }
 
-.rear .lamps, .rear .arrows {
+#radar .rear .lamps, #radar .rear .arrows {
   margin-bottom: 15px;
 }
 
@@ -107,6 +107,26 @@ html, body {
 
 .display.green span { color: #18f400; }
 .display.green { color: #0e3800; background-color: #072600; }
+
+.display.plate {
+  display: block;
+  width: 6em;
+  height: 1.2em;
+  line-height: 1.1em;
+  font-size: 16pt;
+  border: 2px solid #000;
+  font-family: Consolas;
+  letter-spacing: 0.1em;
+}
+
+.display.plate::after {
+  position: absolute;
+  content: '';
+}
+
+.display.plate span {
+  margin-left: 0.4em;
+}
 
 .arrows {
   width: 15px;
@@ -179,3 +199,23 @@ html, body {
     height: 25px;
 }
 
+#plates {
+  width: 180px;
+  height: 100px;
+  position: absolute;
+  bottom: 10px;
+  right: 420px;
+  background-color: #0a0a0a;
+  border: 5px solid #000;
+  border-radius: 10px;
+  z-index: -1;
+}
+
+#plates .label {
+  margin-left: 0.25em;
+  line-height: 1.5em;
+}
+
+#plates .lamps li {
+  width: 3em;
+}

@@ -66,17 +66,23 @@ namespace RS9000
         }
         private bool shouldBeep;
 
-        public readonly IReadOnlyDictionary<string, Antenna> Antennas = new Dictionary<string, Antenna>()
-        {
-            { "front", new Antenna("front", 0) },
-            { "rear", new Antenna("rear", 180) },
-        };
+        public IReadOnlyDictionary<string, Antenna> Antennas { get; }
+
+        public Vehicle Vehicle { get; set; }
+
+        public float FastLimit { get; set; }
 
         private readonly Script script;
 
         public Radar(Script script)
         {
             this.script = script;
+
+            Antennas = new Dictionary<string, Antenna>()
+            {
+                { "front", new Antenna(this, "front", 0) },
+                { "rear", new Antenna(this, "rear", 180) },
+            };
 
             foreach (Antenna antenna in Antennas.Values)
             {
@@ -91,8 +97,8 @@ namespace RS9000
                 return;
             }
 
-            Vehicle v = Script.GetVehicleDriving(Game.PlayerPed);
-            if (v == null)
+            Vehicle = Script.GetVehicleDriving(Game.PlayerPed);
+            if (Vehicle == null)
             {
                 return;
             }
@@ -104,18 +110,12 @@ namespace RS9000
                     continue;
                 }
 
-                antenna.Source = v;
-
-                bool updated = antenna.Poll();
-                if (!updated)
-                {
-                    continue;
-                }
+                antenna.Poll();
             }
 
             Script.SendMessage(MessageType.Heartbeat, new
             {
-                speed = (uint)ConvertMetersToSpeed(script.Config.Units, v.Speed),
+                speed = (uint)ConvertMetersToSpeed(script.Config.Units, Vehicle.Speed),
                 antennas =
                     from a in Antennas.Values
                     where a.IsEnabled && a.Target != null

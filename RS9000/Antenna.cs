@@ -80,6 +80,30 @@ namespace RS9000
         }
         private AntennaMode mode;
 
+        public Entity LockedTarget
+        {
+            get => lockedTarget;
+            set
+            {
+                if (value == lockedTarget)
+                {
+                    return;
+                }
+
+                bool locked = value != null;
+
+                Script.SendMessage(MessageType.TargetLock, new
+                {
+                    name = Name,
+                    locked,
+                    plate = locked && value is Vehicle v ? v.Mods.LicensePlate : null,
+                });
+
+                lockedTarget = value;
+            }
+        }
+        private Entity lockedTarget;
+
         public Entity Target { get; private set; }
 
         public TargetDirection TargetDirection { get; set; }
@@ -88,22 +112,68 @@ namespace RS9000
 
         public float FastSpeed { get; private set; }
 
-        public float FastLimit { get; set; }
-
-        public bool IsFastLocked { get; set; }
-
-        public Entity Source { get; set; }
-
         public string Name { get; }
+
+        public Radar Radar { get; }
 
         public event EventHandler<FastLockedEventArgs> FastLocked;
 
         private readonly Vector3 direction;
 
-        public Antenna(string name, float heading)
+        public Antenna(Radar radar, string name, float heading)
         {
+            Radar = radar;
             Name = name;
             direction = GameMath.HeadingToDirection(heading) + Vector3.UnitX;
+        }
+
+        public void Poll()
+        {
+            if (!IsEnabled || Radar.Vehicle == null)
+            {
+                ClearTarget();
+                return;
+            }
+
+            Vector3 offset = angles[(int)Mode] * direction;
+            Vector3 max = Radar.Vehicle.GetOffsetPosition(offset);
+
+#if DEBUG
+            DrawLine(Radar.Vehicle.Position, max, 0xFF, 0x00, 0x00);
+#endif
+
+            RaycastResult result = World.RaycastCapsule(Radar.Vehicle.Position, max, BeamRadius, (IntersectOptions)10, Radar.Vehicle);
+
+            Target = result.HitEntity;
+            if (Target == null || !Target.Exists())
+            {
+                ClearTarget();
+                return;
+            }
+
+            if (Target is Vehicle v)
+            {
+                Speed = v.Speed;
+            }
+            else
+            {
+                Speed = Target.Velocity.Length();
+            }
+
+            TargetDirection = IsHeadingTowards(Radar.Vehicle, Target) ? TargetDirection.Coming : TargetDirection.Going;
+
+            if (Speed > Radar.FastLimit)
+            {
+                if (Speed > FastSpeed)
+                {
+                    FastSpeed = Speed;
+                }
+                if (LockedTarget == null)
+                {
+                    LockedTarget = Target;
+                    FastLocked?.Invoke(this, new FastLockedEventArgs(Target, TargetDirection, FastSpeed));
+                }
+            }
         }
 
         public void Reset()
@@ -115,60 +185,13 @@ namespace RS9000
         public void ResetFast()
         {
             FastSpeed = 0;
-            IsFastLocked = false;
+            LockedTarget = null;
         }
 
-        public bool Poll()
+        private void ClearTarget()
         {
-            if (!IsEnabled || Source == null)
-            {
-                Target = null;
-                TargetDirection = TargetDirection.None;
-                return false;
-            }
-
-            Vector3 offset = angles[(int)Mode] * direction;
-            Vector3 max = Source.GetOffsetPosition(offset);
-
-#if DEBUG
-            DrawLine(Source.Position, max, 0xFF, 0x00, 0x00);
-#endif
-
-            RaycastResult result = World.RaycastCapsule(Source.Position, max, BeamRadius, (IntersectOptions)10, Source);
-
-            Target = result.HitEntity;
-            if (Target == null || !Target.Exists())
-            {
-                Target = null;
-                TargetDirection = TargetDirection.None;
-                return false;
-            }
-
-            if (Target is Vehicle)
-            {
-                Speed = ((Vehicle)Target).Speed;
-            }
-            else
-            {
-                Speed = Target.Velocity.Length();
-            }
-
-            TargetDirection = IsHeadingTowards(Source, Target) ? TargetDirection.Coming : TargetDirection.Going;
-
-            if (Speed > FastLimit)
-            {
-                if (Speed > FastSpeed)
-                {
-                    FastSpeed = Speed;
-                }
-                if (!IsFastLocked)
-                {
-                    IsFastLocked = true;
-                    FastLocked?.Invoke(this, new FastLockedEventArgs(FastSpeed));
-                }
-            }
-
-            return true;
+            Target = null;
+            TargetDirection = TargetDirection.None;
         }
 
         private static readonly Vector3[] angles = new Vector3[]
@@ -197,10 +220,16 @@ namespace RS9000
 
     internal class FastLockedEventArgs : EventArgs
     {
+        public Entity Target { get; }
+
+        public TargetDirection TargetDirection { get; }
+
         public float Speed { get; }
 
-        public FastLockedEventArgs(float speed)
+        public FastLockedEventArgs(Entity target, TargetDirection direction, float speed)
         {
+            Target = target;
+            TargetDirection = direction;
             Speed = speed;
         }
     }

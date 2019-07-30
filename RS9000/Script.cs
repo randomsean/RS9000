@@ -20,6 +20,8 @@ namespace RS9000
 
         private bool IsDisplayingKeyboard { get; set; }
 
+        private bool sentInit = false;
+
         public Script()
         {
             string configData = API.LoadResourceFile(API.GetCurrentResourceName(), "config.json");
@@ -99,6 +101,19 @@ namespace RS9000
 
         private async Task Update()
         {
+            if (!sentInit)
+            {
+                SendMessage(MessageType.Initialize, new
+                {
+                    plateReader = Config.PlateReader,
+                });
+
+                Radar.FastLimit = Config.FastLimit;
+                Radar.ShouldBeep = Config.Beep;
+
+                sentInit = true;
+            }
+
             await Delay(10);
 
             Radar.Update();
