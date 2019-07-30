@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 using CitizenFX.Core;
-using System.Runtime.Serialization;
 
 namespace RS9000
 {
@@ -14,6 +14,15 @@ namespace RS9000
     {
         [JsonProperty]
         public string Units { get; set; }
+
+        [JsonProperty]
+        public bool PlateReader { get; set; }
+
+        [JsonProperty]
+        public bool Beep { get; set; }
+
+        [JsonProperty]
+        public uint FastLimit { get; set; }
 
         [JsonProperty]
         public ControlListConfig Controls { get; set; }
@@ -27,6 +36,11 @@ namespace RS9000
                 throw new ArgumentException($"units: '{Units}' is not a valid unit type");
             }
 
+            if (FastLimit > Radar.MaxSpeed)
+            {
+                throw new ArgumentException($"defaultFastLimit: '{FastLimit}' is out of range");
+            }
+
             if (Controls.OpenControlPanel.Control == null)
             {
                 throw new ArgumentException("controls.openControlPanel: not a valid input type");
@@ -36,6 +50,9 @@ namespace RS9000
         public static readonly Config Base = new Config()
         {
             Units = "mph",
+            PlateReader = true,
+            Beep = true,
+            FastLimit = 80,
             Controls = new ControlListConfig()
             {
                 OpenControlPanel = new ControlConfig(-1, (int)Control.VehicleDuck),

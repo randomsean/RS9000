@@ -105,8 +105,12 @@ namespace RS9000
             {
                 SendMessage(MessageType.Initialize, new
                 {
-                    plateReader = true,
+                    plateReader = Config.PlateReader,
                 });
+
+                Radar.FastLimit = Config.FastLimit;
+                Radar.ShouldBeep = Config.Beep;
+
                 sentInit = true;
             }
 
