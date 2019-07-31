@@ -20,7 +20,7 @@ namespace RS9000
         /// <summary>
         /// Beamwidth angle at 3db (half-power)
         /// </summary>
-        private const float Beamwidth = 6f; // degrees
+        private const float Beamwidth = 5f; // degrees
 
         /// <summary>
         /// Radius of the beamwidth measured at half-power
@@ -80,7 +80,7 @@ namespace RS9000
         }
         private AntennaMode mode;
 
-        public Entity LockedTarget
+        public Vehicle LockedTarget
         {
             get => lockedTarget;
             set
@@ -96,15 +96,15 @@ namespace RS9000
                 {
                     name = Name,
                     locked,
-                    plate = locked && value is Vehicle v ? v.Mods.LicensePlate : null,
+                    plate = locked ? value.Mods.LicensePlate : null,
                 });
 
                 lockedTarget = value;
             }
         }
-        private Entity lockedTarget;
+        private Vehicle lockedTarget;
 
-        public Entity Target { get; private set; }
+        public Vehicle Target { get; private set; }
 
         public TargetDirection TargetDirection { get; set; }
 
@@ -136,29 +136,32 @@ namespace RS9000
             }
 
             Vector3 offset = angles[(int)Mode] * direction;
+
             Vector3 max = Radar.Vehicle.GetOffsetPosition(offset);
+
+            float groundZ = World.GetGroundHeight(max);
+
+            if (max.Z < groundZ && !(groundZ > max.Z + 1f))
+            {
+                max.Z = groundZ + 0.5f;
+            }
 
 #if DEBUG
             DrawLine(Radar.Vehicle.Position, max, 0xFF, 0x00, 0x00);
 #endif
 
-            RaycastResult result = World.RaycastCapsule(Radar.Vehicle.Position, max, BeamRadius, (IntersectOptions)10, Radar.Vehicle);
+            Vector3 src = Radar.Vehicle.Position;
 
-            Target = result.HitEntity;
+            RaycastResult result = new RaycastResult(API.StartShapeTestCapsule(src.X, src.Y, src.Z, max.X, max.Y, max.Z, BeamRadius, 10 /* vehicles */, Radar.Vehicle.Handle, 7));
+
+            Target = result.HitEntity as Vehicle;
             if (Target == null || !Target.Exists())
             {
                 ClearTarget();
                 return;
             }
 
-            if (Target is Vehicle v)
-            {
-                Speed = v.Speed;
-            }
-            else
-            {
-                Speed = Target.Velocity.Length();
-            }
+            Speed = Target.Speed;
 
             TargetDirection = IsHeadingTowards(Radar.Vehicle, Target) ? TargetDirection.Coming : TargetDirection.Going;
 
@@ -220,13 +223,13 @@ namespace RS9000
 
     internal class FastLockedEventArgs : EventArgs
     {
-        public Entity Target { get; }
+        public Vehicle Target { get; }
 
         public TargetDirection TargetDirection { get; }
 
         public float Speed { get; }
 
-        public FastLockedEventArgs(Entity target, TargetDirection direction, float speed)
+        public FastLockedEventArgs(Vehicle target, TargetDirection direction, float speed)
         {
             Target = target;
             TargetDirection = direction;
