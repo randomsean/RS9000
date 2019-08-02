@@ -103,7 +103,8 @@ namespace RS9000
         private bool ControlPressed(ControlConfig config)
         {
             bool modifier = config.Modifier.HasValue ? Game.IsControlPressed(0, config.Modifier.Value) : true;
-            return modifier && Game.IsControlJustPressed(0, config.Control.Value);
+            bool control = config.Control.HasValue ? Game.IsControlJustPressed(0, config.Control.Value) : false;
+            return modifier && control;
         }
 
         private async Task Update()
