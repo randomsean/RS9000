@@ -7,6 +7,10 @@
     "openControlPanel": {
       "modifier": 224,
       "control": 73
+    },
+    "resetLock": {
+      "modifier": -1,
+      "control": 73
     }
   }
 }

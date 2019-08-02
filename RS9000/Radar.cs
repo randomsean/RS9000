@@ -129,6 +129,14 @@ namespace RS9000
             });
         }
 
+        public void ResetFast()
+        {
+            foreach (Antenna antenna in Antennas.Values)
+            {
+                antenna.ResetFast();
+            }
+        }
+
         public static float ConvertMetersToSpeed(string units, float speed)
         {
             switch (units)

@@ -65,6 +65,9 @@ namespace RS9000
     {
         [JsonProperty]
         public ControlConfig OpenControlPanel { get; set; }
+
+        [JsonProperty]
+        public ControlConfig ResetLock { get; set; }
     }
 
     [JsonObject(MemberSerialization.OptIn)]

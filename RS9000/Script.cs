@@ -77,26 +77,33 @@ namespace RS9000
                 return;
             }
 
-            if (Radar.IsDisplayed && !InEmergencyVehicle)
+            bool inEmergencyVehicle = InEmergencyVehicle;
+
+            if (Radar.IsDisplayed && !inEmergencyVehicle)
             {
                 Radar.IsDisplayed = false;
             }
-            else if (InEmergencyVehicle && !Radar.IsDisplayed && Radar.IsEnabled)
+            else if (inEmergencyVehicle && !Radar.IsDisplayed && Radar.IsEnabled)
             {
                 Radar.IsDisplayed = true;
             }
 
-            bool modifierPressed = Config.Controls.OpenControlPanel.Modifier.HasValue &&
-                Game.IsControlPressed(0, Config.Controls.OpenControlPanel.Modifier.Value);
-
-            bool controlPressed = Game.IsControlJustPressed(0, Config.Controls.OpenControlPanel.Control.Value);
-
-            if (modifierPressed && controlPressed && InEmergencyVehicle)
+            if (ControlPressed(Config.Controls.OpenControlPanel) && inEmergencyVehicle)
             {
                 controller.Visible = !controller.Visible;
             }
+            else if (ControlPressed(Config.Controls.ResetLock) && inEmergencyVehicle)
+            {
+                Radar.ResetFast();
+            }
 
             await Task.FromResult(0);
+        }
+
+        private bool ControlPressed(ControlConfig config)
+        {
+            bool modifier = config.Modifier.HasValue ? Game.IsControlPressed(0, config.Modifier.Value) : true;
+            return modifier && Game.IsControlJustPressed(0, config.Control.Value);
         }
 
         private async Task Update()
