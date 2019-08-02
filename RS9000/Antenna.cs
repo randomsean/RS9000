@@ -167,7 +167,7 @@ namespace RS9000
 
             if (Speed > Radar.FastLimit)
             {
-                if (Speed > FastSpeed)
+                if (Speed > FastSpeed && Target == LockedTarget)
                 {
                     FastSpeed = Speed;
                 }
