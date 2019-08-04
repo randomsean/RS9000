@@ -128,7 +128,7 @@ namespace RS9000
                     plateReader = Config.PlateReader,
                 });
 
-                Radar.FastLimit = Config.FastLimit;
+                Radar.FastLimit = Radar.ConvertSpeedToMeters(Config.Units, Config.FastLimit);
                 Radar.ShouldBeep = Config.Beep;
 
                 sentInit = true;
