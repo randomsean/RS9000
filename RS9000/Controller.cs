@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using CitizenFX.Core;
 using CitizenFX.Core.Native;
@@ -38,9 +39,7 @@ namespace RS9000
             script.RegisterNUICallback("antennaMode", new Action<IDictionary<string, object>, CallbackDelegate>(SwitchAntennaMode));
             script.RegisterNUICallback("toggleBeep", new Action<IDictionary<string, object>, CallbackDelegate>(ToggleBeep));
             script.RegisterNUICallback("resetFast", new Action<IDictionary<string, object>, CallbackDelegate>(ResetFast));
-            script.RegisterNUICallback("setFastLimit", new Action<IDictionary<string, object>, CallbackDelegate>(SetFastLimit));
-
-            script.RegisterEventHandler("rs9000:_keyboardResult", new Action<string>(KeyboardResult));
+            script.RegisterNUICallback("setFastLimit", new Func<IDictionary<string, object>, CallbackDelegate, Task>(SetFastLimit));
 
             this.script = script;
             this.radar = radar; 
@@ -88,32 +87,19 @@ namespace RS9000
 
         private void ResetFast(IDictionary<string, object> body, CallbackDelegate result)
         {
-            foreach (Antenna antenna in radar.Antennas.Values)
-            {
-                antenna.ResetFast();
-            }
+            radar.ResetFast();
         }
 
-        private void SetFastLimit(IDictionary<string, object> body, CallbackDelegate result)
+        private async Task SetFastLimit(IDictionary<string, object> body, CallbackDelegate result)
         {
             Visible = false;
-            script.ShowKeyboard(Radar.MaxSpeed.ToString().Length);
-        }
-
-        private void KeyboardResult(string result)
-        {
-            if (!uint.TryParse(result, out uint n) || n > Radar.MaxSpeed)
+            string input = await Game.GetUserInput(Radar.MaxSpeed.ToString().Length);
+            if (!uint.TryParse(input, out uint n) || n > Radar.MaxSpeed)
             {
                 return;
             }
-
             radar.FastLimit = Radar.ConvertSpeedToMeters(script.Config.Units, n);
-
-            foreach (Antenna antenna in radar.Antennas.Values)
-            {
-                antenna.ResetFast();
-            }
-
+            radar.ResetFast();
             Screen.ShowSubtitle($"Fast limit set to ~y~{n} {script.Config.Units}");
         }
     }

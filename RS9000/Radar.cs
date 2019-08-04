@@ -20,12 +20,12 @@ namespace RS9000
                     return;
                 }
 
-                Script.SendMessage(MessageType.RadarPower, value);
-
                 foreach (Antenna antenna in Antennas.Values)
                 {
                     antenna.IsEnabled = value;
                 }
+
+                Script.SendMessage(MessageType.RadarPower, value);
 
                 isEnabled = value;
             }

@@ -53,12 +53,16 @@ namespace RS9000
             EventHandlers[eventName] += callback;
         }
 
-        public void RegisterNUICallback(string msg, Action<IDictionary<string, object>, CallbackDelegate> callback)
+        public void RegisterNUICallback(string msg, Delegate callback)
         {
             API.RegisterNuiCallbackType(msg);
-            EventHandlers[$"__cfx_nui:{msg}"] += new Action<ExpandoObject, CallbackDelegate>((body, result) =>
+            EventHandlers[$"__cfx_nui:{msg}"] += new Func<ExpandoObject, CallbackDelegate, Task>(async (body, result) =>
             {
-                callback?.Invoke(body, result);
+                object rv = callback?.DynamicInvoke(body, result);
+                if (rv != null && rv is Task t)
+                {
+                    await t;
+                }
             });
         }
 
@@ -139,43 +143,10 @@ namespace RS9000
             Radar.Update();
         }
 
-        public void ShowKeyboard(int limit, string text = "")
-        {
-            if (IsDisplayingKeyboard)
-            {
-                return;
-            }
-
-            API.DisplayOnscreenKeyboard(0, "", "", text, "", "", "", limit);
-
-            Tick += KeyboardUpdate;
-        }
-
-        private Task KeyboardUpdate()
-        {
-            int status = API.UpdateOnscreenKeyboard();
-
-            if (status == 1)
-            {
-                string result = API.GetOnscreenKeyboardResult();
-                TriggerEvent("rs9000:_keyboardResult", result);
-            }
-
-            if (status == 1 || status == 2)
-            {
-                Tick -= KeyboardUpdate;
-                IsDisplayingKeyboard = false;
-            }
-
-            return Task.FromResult(0);
-        }
-
         public static void SendMessage(MessageType type, object data)
         {
             string json = JObject.FromObject(new { type, data }).ToString();
             API.SendNuiMessage(json);
         }
-
-        
     }
 }
