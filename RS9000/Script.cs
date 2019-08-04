@@ -15,6 +15,8 @@ namespace RS9000
     {
         private readonly Radar Radar;
         private readonly Controller controller;
+
+        public string ResourceName { get; }
         
         public Config Config { get; } 
 
@@ -24,7 +26,16 @@ namespace RS9000
 
         public Script()
         {
-            string configData = API.LoadResourceFile(API.GetCurrentResourceName(), "config.json");
+            ResourceName = API.GetCurrentResourceName();
+            foreach (char c in ResourceName)
+            {
+                if (char.IsUpper(c))
+                {
+                    throw new Exception("Resource name cannot contain uppercase characters");
+                }
+            }
+
+            string configData = API.LoadResourceFile(ResourceName, "config.json");
 
             Config = Config.Base;
             JsonConvert.PopulateObject(configData, Config);
@@ -113,6 +124,7 @@ namespace RS9000
             {
                 SendMessage(MessageType.Initialize, new
                 {
+                    resourceName = ResourceName,
                     plateReader = Config.PlateReader,
                 });
 
