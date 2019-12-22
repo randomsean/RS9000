@@ -44,8 +44,17 @@ namespace RS9000
             Radar = new Radar(this);
             controller = new Controller(this, Radar);
 
+            RegisterEvents();
+
             Tick += Update;
             Tick += CheckInputs;
+        }
+
+        private void RegisterEvents()
+        {
+            EventHandlers["rs9000:display"] += new Action<bool>((displayed) => { Radar.IsDisplayed = displayed; });
+            EventHandlers["rs9000:power"] += new Action<bool>((enabled) => { Radar.IsEnabled = enabled; });
+            EventHandlers["rs9000:reset"] += new Action(() => { Radar.ResetFast(); });
         }
 
         public void RegisterEventHandler(string eventName, Delegate callback)
